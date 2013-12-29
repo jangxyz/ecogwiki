@@ -123,7 +123,8 @@ def template(req, path, data):
     data['user'] = user
     data['preferences'] = preferences
     data['users'] = users
-    data['cur_url'] = req.url
+    data['cur_url'] = req.url[:600] # pass on 847, fail on 848 for create login url
+                                    # pass on 600, fail on 700 for create logout url
     data['config'] = config
     data['app'] = {
         'version': main.VERSION,
