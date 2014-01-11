@@ -4,7 +4,7 @@ import caching
 from models import WikiPage
 from google.appengine.ext import deferred
 from representations import TemplateRepresentation
-from resources import RedirectResource, PageResource, RevisionResource, RevisionListResource,\
+from resources import RedirectResource, PageResource, PageEditResource, RevisionResource, RevisionListResource,\
     RelatedPagesResource, WikiqueryResource, TitleListResource, SearchResultResource,\
     TitleIndexResource, PostListResource, ChangeListResource, UserPreferencesResource,\
     SchemaResource
@@ -24,7 +24,10 @@ class PageHandler(webapp2.RequestHandler):
         elif self.request.GET.get('rev', '') != '':
             resource = RevisionResource(self.request, self.response, path, self.request.GET.get('rev', ''))
         else:
-            resource = PageResource(self.request, self.response, path)
+            if self.request.GET.get('view') == 'edit':
+                resource = PageEditResource(self.request, self.response, path)
+            else:
+                resource = PageResource(self.request, self.response, path)
         resource.get(head)
 
     def post(self, path):
@@ -34,7 +37,10 @@ class PageHandler(webapp2.RequestHandler):
         elif method == 'PUT':
             return self.put(path)
 
-        resource = PageResource(self.request, self.response, path)
+        if self.request.GET.get('view') == 'edit':
+            resource = PageEditResource(self.request, self.response, path)
+        else:
+            resource = PageResource(self.request, self.response, path)
         resource.post()
 
     def put(self, path):

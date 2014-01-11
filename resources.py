@@ -59,8 +59,8 @@ class RedirectResource(Resource):
 
 
 class PageLikeResource(Resource):
-    def __init__(self, req, res, path):
-        super(PageLikeResource, self).__init__(req, res)
+    def __init__(self, req, res, path, default_restype='html', default_view='default'):
+        super(PageLikeResource, self).__init__(req, res, default_restype=default_restype, default_view=default_view)
         self.path = path
 
     def represent_html_default(self, page):
@@ -150,21 +150,10 @@ class PageResource(PageLikeResource):
         new_body = self.req.POST['body']
         comment = self.req.POST.get('comment', '')
 
-        view    = self.req.GET.get('view', self.default_view)
-        restype = get_restype(self.req, 'html')
-
-        # POST to edit form, not content
-        if restype == 'html' and view == 'edit':
-            if page.revision == 0:
-                page.body = new_body
-            representation = self.get_representation(page)
-            representation.respond(self.res, head=False)
-            return
-
-        # POST to content
         try:
             page.update_content(page.body + new_body, page.revision, comment, self.user)
             quoted_path = urllib2.quote(self.path.replace(' ', '_'))
+            restype = get_restype(self.req, 'html')
             if restype == 'html':
                 self.res.location = str('/' + quoted_path)
             else:
@@ -249,9 +238,43 @@ class PageResource(PageLikeResource):
             })
             set_response_body(self.res, html, False)
 
-    def represent_html_edit(self, page):
+
+class PageEditResource(PageLikeResource):
+    def __init__(self, req, res, path):
+        super(PageEditResource, self).__init__(req, res, path, default_restype='html', default_view='edit')
+
+    def load(self):
+        return WikiPage.get_by_path(self.path)
+
+    def get(self, head):
+        page = self.load()
+
+        if not page.can_read(self.user):
+            self._403(page, head)
+            return
+
         if page.revision == 0 and self.req.GET.get('body'):
             page.body = self.req.GET.get('body')
+
+        representation = self.get_representation(page)
+        representation.respond(self.res, head)
+
+    def post(self):
+        page = self.load()
+
+        if not page.can_write(self.user):
+            self._403(page)
+            return
+
+        if get_restype(self.req, 'html') == 'html':
+            if page.revision == 0:
+                page.body    = self.req.POST.get('body', '')
+                page.comment = self.req.POST.get('comment', 'scrapped.')
+
+        representation = self.get_representation(page)
+        representation.respond(self.res, head=False)
+
+    def represent_html_edit(self, page):
         return TemplateRepresentation({'page': page}, self.req, 'wikipage.edit.html')
 
 
