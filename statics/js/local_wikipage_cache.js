@@ -80,27 +80,40 @@ var LocalWikipageCache = (function($) {
             window.localStorage.removeItem(this.key(this.title, revision));
         };
 
+        function timeDiff(someTimeAgo) {
+            return moment(someTimeAgo).fromNow();
+        }
+
         this.message = function(content, onClick) {
             var $container;
             var $messageBox = $(
                 '<div class="infobox message wikipage-cache">' + '\n' +
                     '<div class="close">x</div>' + '\n' +
-                    '<p>there is unapplied change at revision ' + content.revision + ': <a href="?view=edit">edit</a></p>' + '\n' + 
                 '</div>' + '\n'
             );
+            var $msg  = $('<p>there is unapplied change from ' + 
+                    '<time title="' + content.saved_at + '">' + 
+                        timeDiff(content.saved_at) + 
+                    '</time>: </p>'),
+
+                $link = $('<a href="?view=edit">edit</a>');
             if (isEditPage()) {
                 $container = $('form.editform');
-                $messageBox.find('a')
+                $link
                     .attr('title', 'appy this content to editor')
                     .text('apply')
                     .on('click', onClick);
+
+                $messageBox
+                    .append($msg.append($link))
+                    .append('<pre>' + content.data + '</pre>');
             } else {
                 $container = $('article .body');
+                $link.attr('title', content.data);
+
+                $messageBox.append($msg.append($link));
             }
-            $container.prepend(
-                $messageBox
-                    .append('<pre>' + content.data + '</pre>')
-            );
+            $container.prepend($messageBox);
         };
 
         this.error = function(contents, onClick) {
@@ -112,30 +125,41 @@ var LocalWikipageCache = (function($) {
             var $msg  = $('<p>there was unsaved cache at.</p>'),
                 $link = $('<a href="?view=edit">edit</a>');
 
+            var $ul = $('<ul></ul>');
+            for(var i=0; i<contents.length; i++) {
+                $ul.append(
+                    '<p>cache from rev. ' + contents[i].revision + 
+                    ', ' + 
+                    '<time title="' + contents[i].saved_at + '">' + 
+                        timeDiff(contents[i].saved_at) + 
+                    '</time>' + 
+                    ':' + 
+                    '<pre>' + contents[i].data + '</pre></p>'
+                );
+            }
+
             var $container;
             if (isEditPage()) {
                 $container = $('form.editform');
                 $msg.text('there was unsaved cache. copy the content if necessary and ');
                 $link
-                    .text('remove')
+                    .text('clear cache')
                     .attr('title', "it's okay to delete cache")
                     .on('click', onClick);
+                $messageBox
+                    .append($msg.append($link))
+                    .append($ul);
             } else {
                 $container = $('article .body');
                 $msg.text('there was unsaved cache.');
-                $link.text('edit');
+                $link
+                    .attr('title', contents[0].data)
+                    .text('edit');
+
+                $messageBox.append($msg.append($link));
             }
 
-            var $ul = $('<ul></ul>');
-            for(var i=0; i<contents.length; i++) {
-                $ul.append('<p>revision ' + contents[i].revision + ': <pre>' + contents[i].data + '</pre></p>');
-            }
-
-            $container.prepend(
-                $messageBox
-                    .append($msg.append($link))
-                    .append($ul)
-            );
+            $container.prepend($messageBox);
         };
 
     };
