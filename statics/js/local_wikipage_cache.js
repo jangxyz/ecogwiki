@@ -36,7 +36,9 @@ var LocalWikipageCache = (function($) {
         };
 
         this.read = function(revision) {
-            return window.localStorage.getItem(this.key(this.title, revision));
+            var key = this.key(this.title, revision);
+            var value = window.localStorage.getItem(key);
+            return JSON.parse(value);
         };
 
         this.readPreviouses = function() {
@@ -64,7 +66,11 @@ var LocalWikipageCache = (function($) {
             if (!isEditPage()) {
                 return;
             }
-            window.localStorage.setItem(this.key(), this.getCurrentContent());
+            window.localStorage.setItem(this.key(), JSON.stringify({
+                revision: this.revision,
+                saved_at: new Date(),
+                data: this.getCurrentContent()
+            }));
         };
 
         this.remove = function(revision) {
@@ -79,7 +85,7 @@ var LocalWikipageCache = (function($) {
             var $messageBox = $(
                 '<div class="infobox message wikipage-cache">' + '\n' +
                     '<div class="close">x</div>' + '\n' +
-                    '<p>there is unapplied change: <a href="?view=edit">edit</a></p>' + '\n' + 
+                    '<p>there is unapplied change at revision ' + content.revision + ': <a href="?view=edit">edit</a></p>' + '\n' + 
                 '</div>' + '\n'
             );
             if (isEditPage()) {
@@ -93,7 +99,7 @@ var LocalWikipageCache = (function($) {
             }
             $container.prepend(
                 $messageBox
-                    .append('<pre>' + content + '</pre>')
+                    .append('<pre>' + content.data + '</pre>')
             );
         };
 
@@ -103,7 +109,7 @@ var LocalWikipageCache = (function($) {
                     '<div class="close">x</div>' + '\n' +
                 '</div>' + '\n'
             );
-            var $msg  = $('<p>there was unsaved cache.</p>'),
+            var $msg  = $('<p>there was unsaved cache at.</p>'),
                 $link = $('<a href="?view=edit">edit</a>');
 
             var $container;
@@ -116,13 +122,13 @@ var LocalWikipageCache = (function($) {
                     .on('click', onClick);
             } else {
                 $container = $('article .body');
-                $msg.text('there was unsaved cache. ');
+                $msg.text('there was unsaved cache.');
                 $link.text('edit');
             }
 
-            var $ul = $('<ul> </ul>');
+            var $ul = $('<ul></ul>');
             for(var i=0; i<contents.length; i++) {
-                $ul.append('<pre>' + contents[i] + '</pre>');
+                $ul.append('<p>revision ' + contents[i].revision + ': <pre>' + contents[i].data + '</pre></p>');
             }
 
             $container.prepend(

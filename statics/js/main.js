@@ -284,7 +284,7 @@ $(function() {
             // apply on click
             pageCache.message(content, function(e) {
                 e.preventDefault();
-                editor.codeMirror.setValue(content);
+                editor.codeMirror.setValue(content.data);
                 saveCache();
                 // close messagebox
                 $(this).parents('.wikipage-cache.message').find('.close').click();
