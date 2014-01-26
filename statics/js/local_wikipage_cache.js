@@ -21,7 +21,7 @@ var LocalWikipageCache = (function($) {
         this.getCurrentContent = function() {
             var body = isEditPage() ? 
                 $('form.editform textarea[name="body"]').text() :
-                null;
+                $('article textarea[name="body"]').text();
             return body;
         };
 
@@ -151,7 +151,7 @@ var LocalWikipageCache = (function($) {
                     .append($ul);
             } else {
                 $container = $('article .body');
-                $msg.text('there was unsaved cache.');
+                $msg.text('there was unsaved cache. ');
                 $link
                     .attr('title', contents[0].data)
                     .text('edit');

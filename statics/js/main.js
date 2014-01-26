@@ -280,7 +280,7 @@ $(function() {
         var pageCache = new LocalWikipageCache();
         //
         var content = pageCache.read();
-        if (content) {
+        if (content && content.data !== pageCache.getCurrentContent()) {
             // apply on click
             pageCache.message(content, function(e) {
                 e.preventDefault();

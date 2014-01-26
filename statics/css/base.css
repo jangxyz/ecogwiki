@@ -731,6 +731,10 @@ article .body .video embed {
 
 /* } */
 /* } Content body */
+
+article textarea[name="body"] {
+	display: none; }
+
 /* Presentation Body { */
 html.meta-pt .top-bar {
   display: none; }

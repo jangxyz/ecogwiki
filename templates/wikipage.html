@@ -249,6 +249,8 @@ window.fbAsyncInit = function() {
             {% endfor %}
         {% endif %}
     </section>
+
+	<textarea name="body">{{page.body}}</textarea>
 </article>
 
 {% if page.published_at and 'pt' not in page.metadata %}
