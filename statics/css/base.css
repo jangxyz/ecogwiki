@@ -109,6 +109,7 @@ div.contents {
   background-color: #E9EDF5;
   border: 1px solid #ccccff; }
 
+.infobox.error .close,
 .infobox.message .close {
   position: relative;
   float: right;
@@ -120,6 +121,14 @@ div.contents {
   opacity: .3;
   cursor: pointer; }
 
+
+.infobox.error {
+  padding: 0.2em 1em;
+  margin: 1em 0;
+  background-color: #FFD2D3;
+  border: 1px solid red; }
+
+.infobox.error pre,
 .infobox.message pre {
   border: 1px solid #cccccc;
   border-radius: 3px;
@@ -127,12 +136,6 @@ div.contents {
   padding: 0.5em;
   line-height: 1.5em;
   font-family: NanumGothicCoding, "Courier New", Courier, monospace; }
-
-.infobox.error {
-  padding: 0.2em 1em;
-  margin: 1em 0;
-  background-color: #FFD2D3;
-  border: 1px solid red; }
 
 @media print {
   .vcaret:before {

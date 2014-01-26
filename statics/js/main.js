@@ -229,7 +229,7 @@ $(function() {
 
     // Close button
     (function() {
-        $(document).on('click', '.message .close', function() {
+        $(document).on('click', '.infobox .close', function() {
             $(this.parentNode).hide();
         });
     })();
@@ -281,13 +281,25 @@ $(function() {
         //
         var content = pageCache.read();
         if (content) {
-            pageCache.warn(content, function(e) {
+            // apply on click
+            pageCache.message(content, function(e) {
                 e.preventDefault();
                 editor.codeMirror.setValue(content);
+                saveCache();
                 // close messagebox
                 $(this).parents('.wikipage-cache.message').find('.close').click();
-                saveCache();
             });
+        } else {
+            var previousContents = pageCache.readPreviouses();
+            if (previousContents.length > 0) {
+                // delete previous caches on click
+                pageCache.error(previousContents, function(e) {
+                    e.preventDefault();
+                    pageCache.clearPreviouses();
+                    // close messagebox
+                    $(this).parents('.wikipage-cache.error').find('.close').click();
+                });
+            }
         }
 
         //
