@@ -120,6 +120,14 @@ div.contents {
   opacity: .3;
   cursor: pointer; }
 
+.infobox.message pre {
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  background-color: #F4F4F4;
+  padding: 0.5em;
+  line-height: 1.5em;
+  font-family: NanumGothicCoding, "Courier New", Courier, monospace; }
+
 .infobox.error {
   padding: 0.2em 1em;
   margin: 1em 0;

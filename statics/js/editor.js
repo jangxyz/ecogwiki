@@ -42,7 +42,7 @@ var editor = (function($) {
             'itemtype': schema,
             'data': data
         };
-    }
+    };
 
     editor.extractYaml = function(body) {
         var p_yaml = /(?:\s{4}|\t)#!yaml\/schema[\n\r]+(((?:\s{4}|\t).+[\n\r]+?)+)/;
@@ -58,7 +58,7 @@ var editor = (function($) {
                 'body': body
             };
         }
-    }
+    };
 
     editor.generateBody = function(data) {
         var lines = [];
@@ -136,12 +136,14 @@ var editor = (function($) {
             });
 
             editor.updateFormValues = function() {
-                $('.editform').find('textarea[name="body"]').val(cm.getValue());
+                $('.editform').find('textarea[name="body"]').text(cm.getValue());
             };
 
             editor.appendContent = function(content) {
                 cm.setValue(cm.getValue() + '\n\n' + content);
             };
+
+            editor.codeMirror = cm;
         } else {
             var $textarea = $('.editform textarea');
             if ($textarea.length === 0) return;

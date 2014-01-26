@@ -274,4 +274,43 @@ $(function() {
             ga('send', 'event', 'Outbound links', url);
         });
     })();
+
+    // local wikipage cache
+    (function() {
+        var pageCache = new LocalWikipageCache();
+        //
+        var content = pageCache.read();
+        if (content) {
+            pageCache.warn(content, function(e) {
+                e.preventDefault();
+                editor.codeMirror.setValue(content);
+                // close messagebox
+                $(this).parents('.wikipage-cache.message').find('.close').click();
+                saveCache();
+            });
+        }
+
+        //
+        if (typeof editor === 'object' && editor.codeMirror) {
+            var cm = editor.codeMirror;
+            // save on blur or on 'enter'
+            cm.on('blur', function(cm, event) {
+                saveCache();
+            });
+            cm.on('keyup', function(cm, event) {
+                if (event.keyCode === 13 && !event.metaKey) {
+                    saveCache();
+                }
+            });
+            var saveCache = function() {
+                editor.updateFormValues();
+                pageCache.save();
+            };
+            // remove
+            $('form.editform').on('submit', function(event) {
+                pageCache.remove();
+            });
+
+        }
+    })();
 });
