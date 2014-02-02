@@ -412,7 +412,9 @@ class TextProperty(TypeProperty):
 
 class NumberProperty(TypeProperty):
     def __init__(self, itemtype, ptype, pname, pvalue):
+        pvalue = str(pvalue)
         super(NumberProperty, self).__init__(itemtype, ptype, pname, pvalue)
+
         try:
             if pvalue.find('.') == -1:
                 self.value = int(pvalue)
@@ -424,18 +426,21 @@ class NumberProperty(TypeProperty):
 
 class IntegerProperty(NumberProperty):
     def __init__(self, itemtype, ptype, pname, pvalue):
+        pvalue = str(pvalue)
         super(IntegerProperty, self).__init__(itemtype, ptype, pname, pvalue)
 
         try:
             self.value = int(pvalue)
         except ValueError:
             raise ValueError('Invalid integer: %s' % pvalue)
+
         if self.value != float(pvalue):
             raise ValueError('Invalid integer: %s' % pvalue)
 
 
 class FloatProperty(NumberProperty):
     def __init__(self, itemtype, ptype, pname, pvalue):
+        pvalue = str(pvalue)
         super(FloatProperty, self).__init__(itemtype, ptype, pname, pvalue)
 
         try:
@@ -508,6 +513,7 @@ class ISBNProperty(TypeProperty):
     P_ISBN = ur'[\dxX]{10,13}'
 
     def __init__(self, itemtype, ptype, pname, pvalue):
+        pvalue = str(pvalue)
         super(ISBNProperty, self).__init__(itemtype, ptype, pname, pvalue)
         if re.match(ISBNProperty.P_ISBN, pvalue) is None:
             raise ValueError('Invalid ISBN: %s' % pvalue)
